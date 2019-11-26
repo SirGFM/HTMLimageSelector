@@ -1,0 +1,132 @@
+<html>
+    <head>
+        <style>
+            body {
+                /* Set background-color, background-image or whatever here */
+            }
+
+            img {
+                border: black;
+                border-width: 1px;
+                border-style: solid;
+                padding: 1px;
+            }
+
+            .selected {
+                background-color: gray;
+            }
+
+            /* These flex-based classes were hacked together based on this page:
+             *   https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+             */
+            .container {
+                padding: 0;
+                margin: 0;
+                list-style: none;
+
+                display: -webkit-box;
+                display: -moz-box;
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: flex;
+
+                flex-wrap: wrap;
+            }
+
+            .item {
+                flex-grow: 1;
+            }
+        </style>
+        <script>
+            document.addEventListener("DOMContentLoaded", function (event) {
+                let _imgs = document.getElementById('img-selector');
+                _imgs.addEventListener('change', loadFiles);
+                let _upd = document.getElementById('update-img-row')
+                _upd.addEventListener('click', updateGrid);
+            })
+
+            function loadFiles() {
+                if (this.files.length <= 0) {
+                    alert("No file selected!");
+                    return;
+                }
+
+                let _imgWidth = document.getElementById('img-width');
+                let _width = _imgWidth.value + 'px';
+                let _imgHeight = document.getElementById('img-height');
+                let _height = _imgHeight.value + 'px';
+
+                let _container = document.getElementById('imgs');
+
+                for (let i = 0; i < this.files.length; i++) {
+                    let _reader = new FileReader();
+                    _reader.onload = function (e) {
+                        let _img = document.createElement('img');
+                        _img.src = e.target.result;
+                        _img.style.width = _width;
+                        _img.style.height = _height;
+                        _img.onclick = selectImage;
+                        _img.ondragstart = ignore;
+                        _container.appendChild(_img);
+                    };
+                    _reader.readAsDataURL(this.files[i]);
+                }
+            }
+
+            function ignore(e) {
+                e.preventDefault();
+            }
+
+            function selectImage(e) {
+                if (this.getAttribute('class') == 'selected')
+                    this.removeAttribute('class', 'selected');
+                else
+                    this.setAttribute('class', 'selected');
+            }
+
+            function updateGrid(e) {
+                let _imgPerRow = document.getElementById('img-row');
+                let _num = _imgPerRow.value;
+                let _imgWidth = document.getElementById('img-width');
+                let _width = _imgWidth.value;
+
+                let _container = document.getElementById('imgs');
+                // XXX: These extra 4 pixels comes from the border-width and the padding
+                _container.style.width = _num * (4 + parseInt(_width)) + 'px';
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container" id="imgs">
+        </div>
+
+        </br>
+        </br>
+        </br>
+
+        <div class="container">
+            <label class="item" for="img-width"> Image width (in pixels): </label>
+            <input class="item" type="number" id="img-width" name="img-width" min="1" />
+            <div class="item" id="extra-space"></div>
+            <div class="item" id="extra-space"></div>
+        </div>
+        <div class="container">
+            <label class="item" for="img-height"> Image height (in pixels): </label>
+            <input class="item" type="number" id="img-height" name="img-height" min="1" />
+            <div class="item" id="extra-space"></div>
+            <div class="item" id="extra-space"></div>
+        </div>
+        <div class="container">
+            <input class="item" id="img-selector" type="file" name="img-selector" multiple="true" />
+        </div>
+
+        </br>
+
+        <div class="container">
+            <label class="item" for="img-row"> Number of images per row: </label>
+            <input class="item" type="number" id="img-row" name="img-row" min="1" />
+            <input class="item" type="button" id="update-img-row" name="update-img-row" value="Update" />
+            <div class="item" id="extra-space"></div>
+        </div>
+    </body>
+</html>
